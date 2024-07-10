@@ -1,4 +1,4 @@
-# ACE: ACE: An Attention-based Model for Cardinality Estimation of Set-Valued Queries
+# ACE: An Attention-based Model for Cardinality Estimation of Set-Valued Queries
 ## Introduction
 This repo contains the source code of ACE
 
