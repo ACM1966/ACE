@@ -4,7 +4,7 @@ from utils.preprocess import *
 from utils.criterion import *
 from utils.customized_dataset import *
 from utils.arg_parser import *
-from model.model import *
+from model.encoder import *
 
 
 if __name__ == '__main__':
@@ -134,10 +134,10 @@ if __name__ == '__main__':
                     # loss_file.flush()
                     # print(epoch, loss1.max().item(), loss2.max().item(), (loss1 + loss2).max().item(), (loss1 + loss2).min().item())
                     if (loss1 + loss2).max().item() < best_loss:
-                        torch.save(agg_model.state_dict(), 'save_model/%s_aggregation_%s_%s_%s.pth' % (dataset, dim, distill_depth, distill_ratio))
-                        torch.save(dis_model.state_dict(), 'save_model/%s_distillation_%s_%s_%s.pth' % (dataset, dim, distill_depth, distill_ratio))
-                        # torch.save(agg_model.state_dict(), 'save_model/%s_aggregation.pth' % (dataset))
-                        # torch.save(dis_model.state_dict(), 'save_model/%s_distillation_sample.pth' % (dataset))
+                        # torch.save(agg_model.state_dict(), 'save_model/%s_aggregation_%s_%s_%s.pth' % (dataset, dim, distill_depth, distill_ratio))
+                        # torch.save(dis_model.state_dict(), 'save_model/%s_distillation_%s_%s_%s.pth' % (dataset, dim, distill_depth, distill_ratio))
+                        torch.save(agg_model.state_dict(), 'save_model/%s_aggregation.pth' % (dataset))
+                        torch.save(dis_model.state_dict(), 'save_model/%s_distillation.pth' % (dataset))
                         best_loss = (loss1 + loss2).max().item()
                         best_epoch = batch
     

@@ -167,3 +167,48 @@ class AttentionPooling(nn.Module):
         # out = self.norm3(out)
 
         return out
+
+
+class PreNormAttention(nn.Module):
+    def __init__(self, dim, data_dim=None, hidden_dim=512, num_heads=4):
+        super().__init__()
+        self.norm = nn.LayerNorm(dim)
+        if data_dim is not None:
+            self.norm_data = nn.LayerNorm(data_dim)
+            self.attention = Attention(dim, data_dim, hidden_dim, num_heads)
+        else:
+            self.attention = Attention(dim, dim, hidden_dim, num_heads)
+        # self.out = nn.Linear(hidden_dim, dim)
+
+
+    def forward(self, x, d=None, mask=None):
+        x = self.norm(x)
+        if d is not None:
+            d = self.norm_data(d)
+            att_out = self.attention(x, d, mask)
+        else:
+            att_out = self.attention(x, x, mask)
+        # att_out = self.out(att_out)
+        
+        return att_out
+    
+
+class PostNormAttention(nn.Module):
+    def __init__(self, dim, data_dim=None, hidden_dim=512, num_heads=4):
+        super().__init__()
+        self.norm = nn.LayerNorm(dim)
+        if data_dim is not None:
+            self.attention = Attention(dim, data_dim, hidden_dim, num_heads)
+        else:
+            self.attention = Attention(dim, dim, hidden_dim, num_heads)
+        # self.out = nn.Linear(hidden_dim, dim)
+
+
+    def forward(self, x, d=None, mask=None):
+        if d is not None:
+            x = self.norm(x + self.attention(x, d, mask))
+        else:
+            x = self.norm(x + self.attention(x, x, mask))
+        # att_out = self.out(att_out)
+        
+        return x

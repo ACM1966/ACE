@@ -7,6 +7,7 @@ from utils.util import *
 
 def read_data(dataset):
     print('Reading data')
+    # TODO: change the path of the folder
     data = pd.read_csv('../data/%s.csv' % dataset, header=None)
     num_element = data[0][0]
     data = data[1:].reset_index(drop=True)
