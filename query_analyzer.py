@@ -101,6 +101,7 @@ if __name__ == '__main__':
                 # train_q_mask = train_q_mask.to(dev)
                 # pred = estimator(lst, train_q_mask, sel)
 
+                # original ACE
                 lst = pad_sequence(lst, True).to(dev)
 
                 pred = estimator(lst, group_embs, sel)
@@ -139,7 +140,9 @@ if __name__ == '__main__':
                         # val_q_mask = val_q_mask.to(dev)
                         # val_pred = estimator(val_lst, val_q_mask, val_sel)
                         
+                        #  original ACE
                         val_lst = pad_sequence(val_lst, True).to(dev)
+
                         val_pred = estimator(val_lst, group_embs, val_sel)
 
                         val_preds = torch.cat((val_preds, val_pred.cpu()))
@@ -185,7 +188,9 @@ if __name__ == '__main__':
                 # test_q_mask = test_q_mask.to(dev)
                 # test_pred = estimator(test_lst, test_q_mask, test_sel)
 
+                # original ACE
                 test_lst = pad_sequence(test_lst, True).to(dev)
+
                 test_pred = estimator(test_lst, group_embs, test_sel)
 
                 test_preds = torch.cat((test_preds, test_pred.cpu()))
@@ -213,7 +218,9 @@ if __name__ == '__main__':
                 # test_lst = test_lst.to(dev)
                 # test_pred = estimator(test_lst, test_q_mask.to(dev), test_sel)
 
+                # original ACE
                 test_lst = pad_sequence(test_lst, True).to(dev)
+                
                 test_pred = estimator(test_lst, group_embs, test_sel)
                 end = time.perf_counter()
                 times.append((end - start) * 1000)
