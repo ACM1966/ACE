@@ -27,8 +27,14 @@ The generated representation is also stored in the folder `./save_model`.
 ### Estimation (online)
 After generating the representation, you could train the estimator by running:
 ```bash
-python3 query_analyzer.py --d [dataset] --qt [query type] --qf [frequency]
+python3 query_analyzer.py --d [dataset] --qt [query type]
 ```
+
+Additionally, you could use the trained model to get the estimation by running:
+```bash
+python3 query_analyzer.py --d [dataset] --m test --qt [query type] --qf [frequency]
+```
+
 Here, the query workloads are divided into three classes based on their type: **superset**, **subset** and **overlap**. Additionally, each query workload are also partitioned into three sub-classes based on the frequency of its comprised elements: **regular**(considering all elements), **high**(only considering high-frequency element) and **low**(only considering high-frequency element).
 
 ## Dynamic Data
