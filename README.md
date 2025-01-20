@@ -3,7 +3,7 @@
 This repo contains the source code of ACE
 
 ## Quick Start
-The link of three datasets with generated query workloads will be provided later. Running the code mainly includes 2 steps: (1) **Featurization** represents the underlying data numerically and outputs the distilled matrix. (2) **Estimation** utilizes the data matrix and the queried element embeddings to predicate the cardinality. 
+The link of three datasets with generated query workloads can be downloaded via [this link](https://drive.google.com/drive/folders/15jcyAAGUkAx30qHAbHz5aWa9jzy0iMij?usp=sharing). Running the code mainly includes 2 steps: (1) **Featurization** represents the underlying data numerically and outputs the distilled matrix. (2) **Estimation** utilizes the data matrix and the queried element embeddings to predicate the cardinality. 
 
 *For the e2e experiment, please refer to [this repo](https://github.com/dbis-ukon/lplm)*.
 
