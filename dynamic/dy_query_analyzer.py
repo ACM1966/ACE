@@ -1,5 +1,7 @@
 import time
 from pathlib import Path
+import os
+
 
 from utils.preprocess import *
 from utils.criterion import *
@@ -31,7 +33,10 @@ if __name__ == '__main__':
     element_emb = nn.Embedding(num_element + 1, dim, padding_idx=0).requires_grad_(False)
 
     # TODO: change the path of the folder
-    folder = os.listdir('/mnt/md1/yufan/data/dynamic/%s' % dataset)
+    # folder = os.listdir('/mnt/md1/yufan/data/dynamic/%s' % dataset)
+    # folder = os.listdir('F:/SciResearch/ACE/data/%s' % dataset)
+    folder = os.listdir('F:/SciResearch/ACE/query/%s' % dataset)  
+      
     num_parts = len(folder) - 1
     train_times = []
     test_mean = []
@@ -53,8 +58,8 @@ if __name__ == '__main__':
 
         if idx < num_parts * 0.9:
             # training
-            train_workload = pd.read_csv('/mnt/md1/yufan/query/%s/dynamic/%s/train/%s.csv' % (dataset, type, idx), header=None)
-            val_workload = pd.read_csv('/mnt/md1/yufan/query/%s/dynamic/%s/val/%s.csv' % (dataset, type, idx), header=None)
+            train_workload = pd.read_csv('F:/SciResearch/ACE/data/query/%s/dynamic/%s/train/%s.csv' % (dataset, type, idx), header=None)
+            val_workload = pd.read_csv('F:/SciResearch/ACE/data/query/%s/dynamic/%s/val/%s.csv' % (dataset, type, idx), header=None)
             train_dataset = MyQueryDataset(train_workload)
             train_loader = DataLoader(train_dataset, shuffle=True, collate_fn=MyQueryDataset.collate_fn)
             val_dataset = MyQueryDataset(val_workload)
@@ -106,7 +111,7 @@ if __name__ == '__main__':
             train_times.append((train_end - train_start) * 1000)
         else:
             # testing
-            test_workload = pd.read_csv('/mnt/md1/yufan/query/%s/dynamic/%s/test_%s/%s.csv' % (dataset, workload_type, workload_freq, idx), header=None)
+            test_workload = pd.read_csv('F:/SciResearch/ACE/data/query/%s/dynamic/%s/test_%s/%s.csv' % (dataset, workload_type, workload_freq, idx), header=None)
             test_dataset = MyQueryDataset(test_workload)
             test_loader = DataLoader(test_dataset, batch_size, collate_fn=MyQueryDataset.collate_fn)
             with torch.no_grad():   

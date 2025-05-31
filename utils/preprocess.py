@@ -1,6 +1,7 @@
 import sklearn.decomposition as sd
 from sklearn.utils.extmath import randomized_svd
 import pandas as pd
+# import os
 
 from utils.util import *
 
@@ -8,7 +9,9 @@ from utils.util import *
 def read_data(dataset):
     print('Reading data')
     # TODO: change the path of the folder
-    data = pd.read_csv('../data/%s.csv' % dataset, header=None)
+    # data = pd.read_csv('../data/%s.csv' % dataset, header=None)
+    data = pd.read_csv('F:/SciResearch/ACE/data/%s.csv' % dataset , header=None)
+    # data = pd.read_csv('../data/%s.csv' % dataset , header=None, encoding='utf-8')
     num_element = data[0][0]
     data = data[1:].reset_index(drop=True)
     return data, int(num_element)

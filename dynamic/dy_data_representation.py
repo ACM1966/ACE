@@ -1,5 +1,7 @@
 import time
 from pathlib import Path
+# import os
+
 
 from utils.preprocess import *
 from utils.customized_dataset import *
@@ -27,18 +29,21 @@ if __name__ == '__main__':
 
     seed_random(args.s)
     # TODO: change the path of the folder
-    folder = os.listdir('/mnt/md1/yufan/data/dynamic/%s' % dataset)
+    # folder = os.listdir('/mnt/md1/yufan/data/dynamic/%s' % dataset)
+    folder = os.listdir('F:/SciResearch/ACE/query/%s' % dataset)
+    
     num_parts = len(folder) - 1
     times = []
 
     for idx in range(-1, num_parts):
         if idx == -1:
-            data = pd.read_csv('/mnt/md1/yufan/data/dynamic/%s/base.csv' % dataset, header=None)
+            # data = pd.read_csv('/mnt/md1/yufan/data/dynamic/%s/base.csv' % dataset, header=None)
+            data = pd.read_csv('F:/SciResearch/ACE/data/%s.csv' % dataset, header=None)
             num_element = data[0][0]
             data = data[1:].reset_index(drop=True)
             element_emb = nn.Embedding(num_element + 1, dim, padding_idx=0).requires_grad_(False)
         else:
-            data = pd.read_csv('/mnt/md1/yufan/data/dynamic/%s/%s.csv' % (dataset, idx), header=None)
+            # data = pd.read_csv('/mnt/md1/yufan/data/dynamic/%s/%s.csv' % (dataset, idx), header=None)
             if idx > 0:
                 is_delete = data[0][0]
                 data = data[1:].reset_index(drop=True)

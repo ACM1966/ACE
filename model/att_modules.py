@@ -93,6 +93,9 @@ class Attention(nn.Module):
 
     def product_att(self, q, k, v, q_mask, k_mask):
         attn = (q @ k.transpose(2, 3)) / math.sqrt(k.size(-1))
+        # 新增语义筛选 (仅此一处修改)
+        if hasattr(self, 'semantic_filter'):
+            attn = attn * self.semantic_filter(q, k)  # 语义注意力门控
         if k_mask is not None:
             attn = attn.masked_fill(k_mask==0., float('-inf'))
         attn = torch.softmax(attn, dim=-1)

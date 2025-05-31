@@ -1,6 +1,12 @@
 from model.att_modules import *
 from model.modules import *
+import os
+import pickle
+from sentence_transformers import SentenceTransformer
 
+def makedirs(path) -> None:
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 class Aggregator(nn.Module):
     def __init__(self, dim):
@@ -28,22 +34,36 @@ class Aggregator(nn.Module):
         
         return x
 
+current_path = os.path.dirname(os.path.abspath(__file__))
+split_root_path = os.path.join(current_path, 'data/split_table')
+save_root_path = os.path.join(current_path, f'data/embedding')
+makedirs(save_root_path)
+# ! set PLM path
+model_dir = os.path.join(current_path, '../huggingface/sentence_transformer/sentence-t5-large')
+plm_model = SentenceTransformer(model_dir)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class PostDistillation(nn.Module):
     def __init__(self, depth, latent_dim, data_dim, first_share=False):
         super().__init__()
         self.cross_attn_1 = PostNormAttention(latent_dim, data_dim)
         self.cross_ffn_1 = PostNormFFN(latent_dim)
-        
+
         if not first_share:
             self.cross_attn_n = PostNormAttention(latent_dim, data_dim)
             self.cross_ffn_n = PostNormFFN(latent_dim)
 
         self.weight_share = first_share
         self.depth = depth
+
+        # 新增语义投影层 (仅此一处修改)
+        self.semantic_projection = nn.Linear(data_dim, latent_dim)
     
     
     def forward(self, data, latents):
+        # 语义增强 (新增1行)
+        data = data + F.gelu(self.semantic_projection(data))  # 语义残差连接
+
         latents = latents.repeat(data.size(0), 1, 1)
         latents = self.cross_attn_1(latents, data)
         latents = self.cross_ffn_1(latents)
@@ -65,9 +85,17 @@ class Featurization(nn.Module):
         self.aggregator = Aggregator(data_dim)
         # self.distillation = Perceiver(distill_depth, latent_dim, data_dim, distill_share)
         self.distillation = PostDistillation(distill_depth, latent_dim, data_dim, distill_share)
-    
+
+        # 新增语义筛选层 (仅此一处修改)
+        self.semantic_gate = nn.Sequential(
+            nn.Linear(data_dim, 1),
+            nn.Sigmoid()
+        )
 
     def forward(self, x, pos_samples, neg_samples, mask, distilled_embs=None):
+        # 语义筛选 (新增3行)
+        semantic_weights = self.semantic_gate(x)  # [batch, seq_len, 1]
+        x = x * semantic_weights  # 语义加权
         set_embs = self.aggregator(x, mask)
 
         concat_samples = torch.cat((pos_samples, neg_samples), dim=1)
