@@ -58,14 +58,15 @@ if __name__ == '__main__':
     # val_dataset = MyQueryDataset(val_workload)
     # val_loader = DataLoader(val_dataset, batch_size, True, collate_fn=MyQueryDataset.collate_fn)
 
-    train_workload = pd.read_csv('../query/%s/%s/train_workload.csv' % (dataset, workload_type), header=None, nrows=200)
+    train_workload = pd.read_csv('F:/SciResearch/ACE/query/%s/%s/train_workload.csv' % (dataset, workload_type), header=None, nrows=200)
     train_dataset = MyQueryDataset(train_workload)
     train_loader = DataLoader(train_dataset, batch_size, True, collate_fn=MyQueryDataset.collate_fn)
-    val_workload = pd.read_csv('../query/%s/%s/val_workload.csv' % (dataset, workload_type), header=None, nrows=100)
+    val_workload = pd.read_csv('F:/SciResearch/ACE/query/%s/%s/val_workload.csv' % (dataset, workload_type), header=None, nrows=100)
     val_dataset = MyQueryDataset(val_workload)
     val_loader = DataLoader(val_dataset, batch_size, True, collate_fn=MyQueryDataset.collate_fn)
 
     print(len(train_loader), len(val_loader))
+    # np.save('%s_freq.npy' % dataset,lr)
     degree = np.load('%s_freq.npy' % dataset)
     degree = torch.from_numpy(degree)
     times = []
@@ -158,7 +159,7 @@ if __name__ == '__main__':
     else:
         # test
         print('Evaluation')
-        test_workload = pd.read_csv('../query/%s/%s/test_%s/%s.csv' % (dataset, workload_type, workload_freq, dataset), header=None)
+        test_workload = pd.read_csv('F:/SciResearch/ACE/query/%s/%s/test_%s/%s.csv' % (dataset, workload_type, workload_freq, dataset), header=None)
         test_dataset = MyQueryDataset(test_workload)
         test_loader = DataLoader(test_dataset, batch_size, collate_fn=MyQueryDataset.collate_fn)
         estimator.load_state_dict(torch.load('save_model/%s_estimator_%s_%s.pth' % (dataset, workload_type, distill_ratio)))
