@@ -13,13 +13,13 @@ You need to change the folder path. You can search `TODO` to see all places.
 ### Featurization (offline)
 To train a model to represent data, you could run:
 ```bash
-python3 data_encoder.py --d [dataset] --r [distill ratio] --dis_dep [distill depth]
+python data_encoder.py --d [dataset] --r [distill ratio] --dis_dep [distill depth]
 ```
 This command will split the dataset into training and testing data. Then the trained aggregation and distillation models are stored in the folder `./save_model`.
 
 Then, you could run the following command to generate the distilled dataset representation.
 ```bash
-python3 data_representation.py --d [dataset] --r [distill ratio] --dis_sep [distill depth]
+python data_representation.py --d [dataset] --r [distill ratio] --dis_sep [distill depth]
 ```
 
 The generated representation is also stored in the folder `./save_model`.
@@ -27,12 +27,12 @@ The generated representation is also stored in the folder `./save_model`.
 ### Estimation (online)
 After generating the representation, you could train the estimator by running:
 ```bash
-python3 query_analyzer.py --d [dataset] --qt [query type]
+python query_analyzer.py --d [dataset] --qt [query type]
 ```
 
 Additionally, you could use the trained model to get the estimation by running:
 ```bash
-python3 query_analyzer.py --d [dataset] --m test --qt [query type] --qf [frequency]
+python query_analyzer.py --d [dataset] --m test --qt [query type] --qf [frequency]
 ```
 
 Here, the query workloads are divided into three classes based on their type: **superset**, **subset** and **overlap**. Additionally, each query workload are also partitioned into three sub-classes based on the frequency of its comprised elements: **regular**(considering all elements), **high**(only considering high-frequency element) and **low**(only considering high-frequency element).
