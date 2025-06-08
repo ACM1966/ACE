@@ -29,6 +29,22 @@ class Aggregator(nn.Module):
             nn.Linear(dim, dim),
             nn.Sigmoid()
         )
+        
+        # 多头自注意力层
+        self.self_attention = nn.MultiheadAttention(
+            embed_dim=dim,
+            num_heads=num_heads,
+            batch_first=True
+        )
+        self.norm = nn.LayerNorm(dim)
+        
+        # 估计层
+        self.estimation_layer = nn.Sequential(
+            nn.Linear(dim, dim // 2),
+            nn.ReLU(),
+            nn.Linear(dim // 2, 1),
+            nn.Sigmoid()
+        )
 
     
     def forward(self, x, m=None):
@@ -49,8 +65,17 @@ class Aggregator(nn.Module):
         semantic_weights = self.semantic_gate(x)
         x = x + semantic_features * semantic_weights  # 语义残差连接
         x = F.normalize(x)  # 再次归一化
+
+        # 多头自注意力交互
+        x_attn = x.unsqueeze(1)  # [batch, 1, dim]
+        attn_output, _ = self.self_attention(x_attn, x_attn, x_attn)
+        x = x + attn_output.squeeze(1)  # 残差连接
+        x = self.norm(x)
         
-        return x
+        # 基数估计
+        estimation = self.estimation_layer(x)
+        
+        return x, estimation
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 split_root_path = os.path.join(current_path, 'data/split_table')

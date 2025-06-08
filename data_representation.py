@@ -49,8 +49,11 @@ if __name__ == '__main__':
                 pos_sample = element_emb(pos_idx)
                 neg_sample = element_emb(neg_idx)
                 
-                set_embs = agg_model(element_embs, masks)
+                # set_embs = agg_model(element_embs, masks)
 
+                # 获取特征表示和估计值
+                set_embs, estimation = agg_model(element_embs, masks)
+                
                 group_idx = torch.randperm(set_embs.size(0))[:max(int(set_embs.size(0) * distill_ratio), 2)]
                 groups = set_embs[group_idx].detach()
                 groups = dis_model(set_embs.unsqueeze(0), groups)

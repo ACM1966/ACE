@@ -54,6 +54,28 @@ if __name__ == '__main__':
     # loader = DataLoader(data_set, batch_size, collate_fn=SequentialDataset.collate_fn)
     # print(len(loader))
 
+    # 添加训练循环中的基数估计损失
+    criterion = nn.MSELoss()
+    q_criterion = q_error_criterion  # 从utils.criterion导入
+    
+    for epoch in range(args.de):
+        total_loss = 0
+        for _, (data, pos_idx, neg_idx) in enumerate(train_loader):
+            data = pad_sequence(data, True)
+            element_embs = element_emb(data)
+            masks = torch.sign(torch.sum(torch.abs(element_embs), -1))
+            masks = masks.unsqueeze(-1)
+            
+            # 获取特征表示和估计值
+            set_embs, estimation = agg_model(element_embs, masks)
+            
+            # 计算基数估计损失
+            card_loss = criterion(estimation, true_cardinality) + q_criterion(estimation, true_cardinality)
+            
+            # 添加到总损失中
+            total_loss = total_loss + card_loss
+            
+
     # model = Featurization(distill_depth, dim, dim, int(distill_ratio * batch_size), False).to(dev)
     # model = Featurization(distill_depth, dim, dim, distill_ratio, False).to(dev)
     agg_model = Aggregator(dim).to(dev)
