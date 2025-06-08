@@ -17,6 +17,18 @@ class Aggregator(nn.Module):
         self.pool = nn.AdaptiveAvgPool2d((1, dim))
         # # max pooling
         # self.pool = nn.AdaptiveMaxPool2d((1, dim))
+        
+        # 语义处理层
+        self.semantic_layer = nn.Sequential(
+            nn.Linear(dim, dim),
+            nn.GELU(),
+            nn.Linear(dim, dim)
+        )
+        # 语义门控
+        self.semantic_gate = nn.Sequential(
+            nn.Linear(dim, dim),
+            nn.Sigmoid()
+        )
 
     
     def forward(self, x, m=None):
@@ -32,6 +44,12 @@ class Aggregator(nn.Module):
         x = self.pool(x).squeeze(1)
         x = F.normalize(x)
         
+        # 在特征聚合后添加语义处理
+        semantic_features = self.semantic_layer(x)
+        semantic_weights = self.semantic_gate(x)
+        x = x + semantic_features * semantic_weights  # 语义残差连接
+        x = F.normalize(x)  # 再次归一化
+        
         return x
 
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -39,8 +57,9 @@ split_root_path = os.path.join(current_path, 'data/split_table')
 save_root_path = os.path.join(current_path, f'data/embedding')
 makedirs(save_root_path)
 # ! set PLM path
-model_dir = os.path.join(current_path, '../huggingface/sentence_transformer/sentence-t5-large')
+model_dir = 'sentence-transformers/sentence-t5-large'
 plm_model = SentenceTransformer(model_dir)
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class PostDistillation(nn.Module):
@@ -93,9 +112,11 @@ class Featurization(nn.Module):
         )
 
     def forward(self, x, pos_samples, neg_samples, mask, distilled_embs=None):
-        # 语义筛选 (新增3行)
-        semantic_weights = self.semantic_gate(x)  # [batch, seq_len, 1]
-        x = x * semantic_weights  # 语义加权
+        # # 语义筛选 (新增3行)
+        # semantic_weights = self.semantic_gate(x)  # [batch, seq_len, 1]
+        # x = x * semantic_weights  # 语义加权
+        
+        # 直接使用 aggregator 进行特征聚合和语义处理
         set_embs = self.aggregator(x, mask)
 
         concat_samples = torch.cat((pos_samples, neg_samples), dim=1)
